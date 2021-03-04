@@ -15,7 +15,7 @@ const useStorage = () => {
     try {
       const res = await storageRef.put(file);
       // represent l'urll de la sauvegarde dans le storage
-      url.value = res.ref.getDownloadURL();
+      url.value = await res.ref.getDownloadURL();
     } catch (err) {
       console.error(err.message);
       error.value = err.message;

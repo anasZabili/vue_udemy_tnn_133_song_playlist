@@ -1,5 +1,5 @@
 <template>
-  <div class="navba">
+  <div class="navbar">
     <nav>
       <img src="@/assets/ninja.png" alt="ninja" />
       <h1>
@@ -49,6 +49,9 @@ nav {
   max-width: 1200px;
   margin: 0 auto;
 }
+nav img {
+  max-height: 60px;
+}
 nav h1 {
   margin-left: 20px;
 }
@@ -59,8 +62,5 @@ nav .links a,
 button {
   margin-left: 16px;
   font-size: 14px;
-}
-nav img {
-  max-height: 60px;
 }
 </style>
