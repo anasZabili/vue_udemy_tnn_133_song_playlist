@@ -10,6 +10,7 @@
       <h2>{{ playlist.title }}</h2>
       <p class="username">Created by {{ playlist.userName }}</p>
       <p class="description">{{ playlist.description }}</p>
+      <button v-if="ownerShip">Delete Playlist</button>
     </div>
     <!-- song playlist -->
     <div class="song-list">
@@ -20,12 +21,22 @@
 
 <script>
 import getDocument from "@/composables/getDocument";
+import getUser from "@/composables/getUser";
+import { computed } from "vue";
 
 export default {
   props: ["id"],
   setup(props, context) {
     const { error, document: playlist } = getDocument("playlists", props.id);
-    return { error, playlist };
+    const { user } = getUser();
+    // on va utiliser une computed property car le user connecté va changer
+    // au cour du cycle de vie de l'applications on peut changer d'utilisateur
+    const ownerShip = computed(() => {
+      return (
+        playlist.value && user.value && user.value.uid === playlist.value.userId
+      );
+    });
+    return { error, playlist, ownerShip };
   },
 };
 </script>
