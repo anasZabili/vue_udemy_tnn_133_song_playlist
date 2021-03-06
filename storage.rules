@@ -1,8 +1,17 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if request.auth!=null;
+    // ici on autorise seulement l'acces au dossiers
+    // covers, puis on met le nom de dossier  (leur id) dans la var uid
+    match /covers/{userId}/{allPaths=**} {
+      // on autorise tout les utilisateur connecter
+      // a cree et lire des fichier (ici des images)
+      // create != write create est la creation 
+      // write creation + modification
+      allow read, create: if request.auth!=null;
+      // on autorise la supression seulement au utilisateur
+      // conncté proprietaire de la ressource
+      allow delete: if request.auth.uid == userId;
     }
   }
 }

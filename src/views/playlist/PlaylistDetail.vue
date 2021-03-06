@@ -10,7 +10,9 @@
       <h2>{{ playlist.title }}</h2>
       <p class="username">Created by {{ playlist.userName }}</p>
       <p class="description">{{ playlist.description }}</p>
-      <button @click="handleDelete" v-if="!isPending">Delete Playlist</button>
+      <button @click="handleDelete" v-if="ownerShip && !isPending">
+        Delete Playlist
+      </button>
       <button disabled v-if="ownerShip && isPending">Loading...</button>
       <div class="error">
         {{ errorDelete }}
