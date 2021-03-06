@@ -1,9 +1,18 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2021, 3, 28);
+    // ici on autorise seulement l'acces au document playlists
+    // puis on met l'id des document dans un variables docID
+    match /playlists/{docId} {
+      // ici on autorise seulement les lectures et ecriture si
+      // l'utilisateur est connecté
+      allow read, create: if request.auth != null;
+
+      // on autorise la supression et l'update seulement aux utilisateur
+      // connecté proprietaire du document
+      // ressource reprensente la ressource avec laquel on essai d'interagir
+      allow delete, update: if request.auth.uid == ressource.data.userId;
+
     }
   }
 }

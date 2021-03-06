@@ -10,9 +10,7 @@
       <h2>{{ playlist.title }}</h2>
       <p class="username">Created by {{ playlist.userName }}</p>
       <p class="description">{{ playlist.description }}</p>
-      <button @click="handleDelete" v-if="ownerShip && !isPending">
-        Delete Playlist
-      </button>
+      <button @click="handleDelete" v-if="!isPending">Delete Playlist</button>
       <button disabled v-if="ownerShip && isPending">Loading...</button>
       <div class="error">
         {{ errorDelete }}
@@ -31,18 +29,21 @@ import getUser from "@/composables/getUser";
 import useDocument from "@/composables/useDocument";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
+import useStorage from "@/composables/useStorage";
 
 export default {
   props: ["id"],
   setup(props, context) {
     const { error, document: playlist } = getDocument("playlists", props.id);
     const { user } = getUser();
+    const { deleteImage } = useStorage();
     const { error: errorDelete, isPending, deleteDoc } = useDocument(
       "playlists",
       props.id
     );
     const router = useRouter();
     const handleDelete = async () => {
+      await deleteImage(playlist.value.filePath);
       await deleteDoc();
       if (!errorDelete.value) {
         router.push({ name: "Home" });
