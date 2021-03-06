@@ -10,7 +10,13 @@
       <h2>{{ playlist.title }}</h2>
       <p class="username">Created by {{ playlist.userName }}</p>
       <p class="description">{{ playlist.description }}</p>
-      <button v-if="ownerShip">Delete Playlist</button>
+      <button @click="handleDelete" v-if="ownerShip && !isPending">
+        Delete Playlist
+      </button>
+      <button disabled v-if="ownerShip && isPending">Loading...</button>
+      <div class="error">
+        {{ errorDelete }}
+      </div>
     </div>
     <!-- song playlist -->
     <div class="song-list">
@@ -22,13 +28,26 @@
 <script>
 import getDocument from "@/composables/getDocument";
 import getUser from "@/composables/getUser";
+import useDocument from "@/composables/useDocument";
 import { computed } from "vue";
+import { useRouter } from "vue-router";
 
 export default {
   props: ["id"],
   setup(props, context) {
     const { error, document: playlist } = getDocument("playlists", props.id);
     const { user } = getUser();
+    const { error: errorDelete, isPending, deleteDoc } = useDocument(
+      "playlists",
+      props.id
+    );
+    const router = useRouter();
+    const handleDelete = async () => {
+      await deleteDoc();
+      if (!errorDelete.value) {
+        router.push({ name: "Home" });
+      }
+    };
     // on va utiliser une computed property car le user connecté va changer
     // au cour du cycle de vie de l'applications on peut changer d'utilisateur
     const ownerShip = computed(() => {
@@ -36,7 +55,7 @@ export default {
         playlist.value && user.value && user.value.uid === playlist.value.userId
       );
     });
-    return { error, playlist, ownerShip };
+    return { error, playlist, ownerShip, handleDelete, isPending, errorDelete };
   },
 };
 </script>
