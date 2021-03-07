@@ -11,6 +11,7 @@
             >Create Playlist</router-link
           >
           <router-link :to="{ name: 'UserPlaylist' }">My Playlist</router-link>
+          <span>Hi there {{ user.displayName }} </span>
           <button @click="handleLogout">Logout</button>
         </div>
         <div v-else>
@@ -33,7 +34,6 @@ export default {
     const router = useRouter();
     const handleLogout = async () => {
       await logout();
-      console.log("logout");
       router.push({ name: "Home" });
     };
     return { handleLogout, user };
@@ -66,5 +66,12 @@ nav .links a,
 button {
   margin-left: 16px;
   font-size: 14px;
+}
+span {
+  font-size: 14px;
+  display: inline-block;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid #eee;
 }
 </style>
