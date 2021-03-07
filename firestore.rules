@@ -11,7 +11,7 @@ service cloud.firestore {
       // on autorise la supression et l'update seulement aux utilisateur
       // connecté proprietaire du document
       // ressource reprensente la ressource avec laquel on essai d'interagir
-      allow delete, update: if request.auth.uid == ressource.data.userId;
+      allow delete, update: if request.auth.uid == resource.data.userId;
 
     }
   }

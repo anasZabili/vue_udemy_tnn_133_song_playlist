@@ -20,7 +20,24 @@
     </div>
     <!-- song playlist -->
     <div class="song-list">
-      <p>song list here</p>
+      <div v-if="!playlist.songs.length">No songs yet in the playlist</div>
+      <div class="single-song" v-for="song in playlist.songs" :key="song.id">
+        <div class="details">
+          <h3>{{ song.title }}</h3>
+          <p>{{ song.artist }}</p>
+        </div>
+        <button
+          v-if="ownerShip"
+          @click="
+            () => {
+              handleDeleteSongs(song.id);
+            }
+          "
+        >
+          Delete song
+        </button>
+      </div>
+      <AddSong v-if="ownerShip" :playlist="playlist" />
     </div>
   </div>
 </template>
@@ -32,9 +49,11 @@ import useDocument from "@/composables/useDocument";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import useStorage from "@/composables/useStorage";
+import AddSong from "@/components/AddSong";
 
 export default {
   props: ["id"],
+  components: { AddSong },
   setup(props, context) {
     const { error, document: playlist } = getDocument("playlists", props.id);
     const { user } = getUser();
@@ -44,12 +63,19 @@ export default {
       props.id
     );
     const router = useRouter();
+    const { updateDoc } = useDocument("playlists", props.id);
     const handleDelete = async () => {
       await deleteImage(playlist.value.filePath);
       await deleteDoc();
       if (!errorDelete.value) {
         router.push({ name: "Home" });
       }
+    };
+    const handleDeleteSongs = async (id) => {
+      const newSongs = playlist.value.songs.filter((song) => song.id !== id);
+      await updateDoc({
+        songs: newSongs,
+      });
     };
     // on va utiliser une computed property car le user connecté va changer
     // au cour du cycle de vie de l'applications on peut changer d'utilisateur
@@ -58,7 +84,15 @@ export default {
         playlist.value && user.value && user.value.uid === playlist.value.userId
       );
     });
-    return { error, playlist, ownerShip, handleDelete, isPending, errorDelete };
+    return {
+      error,
+      playlist,
+      ownerShip,
+      handleDelete,
+      isPending,
+      errorDelete,
+      handleDeleteSongs,
+    };
   },
 };
 </script>
@@ -101,5 +135,12 @@ export default {
 }
 .description {
   text-align: left;
+}
+.single-song {
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--secondary);
+  margin-bottom: 20px;
 }
 </style>
